@@ -1,9 +1,66 @@
-import * as cdk from '@aws-cdk/core';
+import {Stack,StackProps,Construct,Duration} from '@aws-cdk/core';
+import * as lambda from "@aws-cdk/aws-lambda";
+import * as ddb from "@aws-cdk/aws-dynamodb";
+import {Rule,Schedule}  from '@aws-cdk/aws-events';
+import * as targets from '@aws-cdk/aws-events-targets';
+import * as iam from "@aws-cdk/aws-iam" 
+import { Tracing } from '@aws-cdk/aws-lambda';
+interface CowinCdkStackProps extends StackProps {
+  district: string;
+  districtName : string;
+  token: string;
+  telegramToken: string;
+  telegramChat: string;
+  email: string;
+  telegramChat45: string;
+  rateMin: string;
+}
 
-export class CowinCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CowinCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props: CowinCdkStackProps) {
     super(scope, id, props);
 
+    const emailList = new ddb.Table(this, 'EmailList', {
+      partitionKey: { name: 'email', type: ddb.AttributeType.STRING }
+    });
+
+    const cooloff = new ddb.Table(this, 'CoolOff', {
+      partitionKey: { name: "district", type: ddb.AttributeType.STRING },
+      timeToLiveAttribute: 'timetolive'
+    });
+    
+
     // The code that defines your stack goes here
+    const lambdaFunction = new lambda.Function(this, "CoWinData", {
+      runtime: lambda.Runtime.NODEJS_12_X, 
+      code: lambda.Code.fromAsset("lambda"),
+      handler: "getdata.main",
+      memorySize: 128,
+      environment: {
+        'DISTRICT': props.district,
+        'DISTRICT_NAME' : props.districtName,
+        'TABLE_NAME' : emailList.tableName,
+        'TOKEN' : props.token,
+        'COOLOFF' : cooloff.tableName,
+        'TELEGRAMTOKEN' : props.telegramToken,
+        'TELEGRAMCHAT' : props.telegramChat,
+        'EMAIL': props.email,
+        'TELEGRMCHAT45' : props.telegramChat45
+      },
+      retryAttempts: 2,
+      tracing: Tracing.ACTIVE
+    });
+
+    emailList.grantReadWriteData(lambdaFunction);
+    cooloff.grantReadWriteData(lambdaFunction);
+    lambdaFunction.role?.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSESFullAccess")
+    );
+    const rule = new Rule(this, 'Rule', {
+      schedule: Schedule.expression('rate('+props.rateMin+' minutes)')
+    });
+    rule.addTarget(new targets.LambdaFunction(lambdaFunction));
+
+    //Tags.of(lambdaFunction).add('auto-delete', 'never');
   }
 }
