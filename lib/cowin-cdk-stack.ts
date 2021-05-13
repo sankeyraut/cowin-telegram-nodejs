@@ -13,21 +13,12 @@ interface CowinCdkStackProps extends StackProps {
   telegramChat: string;
   email: string;
   telegramChat45: string;
-  rateMin: string;
+  frequency: string;
 }
 
 export class CowinCdkStack extends Stack {
   constructor(scope: Construct, id: string, props: CowinCdkStackProps) {
     super(scope, id, props);
-
-    const emailList = new ddb.Table(this, 'EmailList', {
-      partitionKey: { name: 'email', type: ddb.AttributeType.STRING }
-    });
-
-    const cooloff = new ddb.Table(this, 'CoolOff', {
-      partitionKey: { name: "district", type: ddb.AttributeType.STRING },
-      timeToLiveAttribute: 'timetolive'
-    });
     
 
     // The code that defines your stack goes here
@@ -39,9 +30,7 @@ export class CowinCdkStack extends Stack {
       environment: {
         'DISTRICT': props.district,
         'DISTRICT_NAME' : props.districtName,
-        'TABLE_NAME' : emailList.tableName,
         'TOKEN' : props.token,
-        'COOLOFF' : cooloff.tableName,
         'TELEGRAMTOKEN' : props.telegramToken,
         'TELEGRAMCHAT' : props.telegramChat,
         'EMAIL': props.email,
@@ -51,13 +40,8 @@ export class CowinCdkStack extends Stack {
       tracing: Tracing.ACTIVE
     });
 
-    emailList.grantReadWriteData(lambdaFunction);
-    cooloff.grantReadWriteData(lambdaFunction);
-    lambdaFunction.role?.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSESFullAccess")
-    );
     const rule = new Rule(this, 'Rule', {
-      schedule: Schedule.expression('rate('+props.rateMin+' minutes)')
+      schedule: Schedule.expression('cron('+props.frequency+')')
     });
     rule.addTarget(new targets.LambdaFunction(lambdaFunction));
 

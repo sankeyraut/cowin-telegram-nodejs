@@ -1,18 +1,12 @@
 const axios = require("axios");
 var aws = require("aws-sdk");
-var docClient = new aws.DynamoDB.DocumentClient();
-var ses = new aws.SES({ region: "ap-south-1" });
 
 let district = process.env.DISTRICT;
 let districtName = process.env.DISTRICT_NAME;
-let tableName = process.env.TABLE_NAME;
-let coolOffTable = process.env.COOLOFF;
 let token = process.env.TOKEN;
-let cooloffHrs = 1;
 let telegramToken = process.env.TELEGRAMTOKEN;
 let telegramChat = process.env.TELEGRAMCHAT;
 let telegramChat45 = process.env.TELEGRMCHAT45;
-let sendEmail = process.env.EMAIL;
 
 function sleep(milliseconds) {
   const date = Date.now();
@@ -127,7 +121,6 @@ exports.main = function (event, context) {
           }
         });
       });
-      // send one email per district
       console.log(
         "Email Message will be send -> ",
         vaccineAvailabilityEmailMessage
@@ -157,8 +150,6 @@ exports.main = function (event, context) {
       }
 
       if (vaccineAvailabilityEmailMessage.length > 0) {
-        //Send email only if there is no cooloff
-
         axios
           .get(
             "https://api.telegram.org/bot" +
