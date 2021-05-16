@@ -11,7 +11,6 @@ interface CowinCdkStackProps extends StackProps {
   token: string;
   telegramToken: string;
   telegramChat: string;
-  email: string;
   telegramChat45: string;
   frequency: string;
 }
@@ -33,7 +32,6 @@ export class CowinCdkStack extends Stack {
         'TOKEN' : props.token,
         'TELEGRAMTOKEN' : props.telegramToken,
         'TELEGRAMCHAT' : props.telegramChat,
-        'EMAIL': props.email,
         'TELEGRMCHAT45' : props.telegramChat45
       },
       retryAttempts: 2,

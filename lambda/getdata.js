@@ -74,49 +74,49 @@ exports.main = function (event, context) {
       data.centers.forEach((center) => {
         noresponse = false;
         var centerName = center.name;
+        var centerAddress = center.address;
+        var pincode = center.pincode;
+        var block = center.block_name;
+        var feeType = center.fee_type
         center.sessions.forEach((session) => {
           var date = session.date;
           var minage = session.min_age_limit;
           var capacity = session.available_capacity;
+          var dose1 = session.available_capacity_dose1
+          var dose2 = session.available_capacity_dose2
           var vaccine = session.vaccine;
           if (capacity > 10 && minage < 44) {
             var emailmessage =
               "*** " +
-              capacity +
-              " " +
-              vaccine +
-              " " +
+              capacity + " " +
+              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
               " vaccine(s) available in center :" +
-              centerName +
-              " on " +
+              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              "  \nDate : " +
               date +
               " \n";
             vaccineAvailabilityEmailMessage.push(emailmessage);
           } else if (capacity > 10 && minage > 44) {
             var message =
               "*** " +
-              capacity +
-              " " +
-              vaccine +
-              " " +
+              capacity +" " +
+              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
               " vaccine(s) available in center :" +
-              centerName +
-              " on " +
+              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              "  \nDate : " +
               date +
               " \n";
             vaccineAvailabilityEmailMessage45.push(message);
           } else {
             var message =
-              "Capacity for age " +
-              minage +
-              " in centerName " +
-              centerName +
-              " on " +
+              "*** " +
+              capacity + " " +
+              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
+              " vaccine(s) available in center :" +
+              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              " \nDate : " +
               date +
-              " @District : " +
-              districtName +
-              " is " +
-              capacity;
+              " \n";
             console.log(message);
           }
         });
@@ -129,10 +129,7 @@ exports.main = function (event, context) {
         "Email Message will be send -> ",
         vaccineAvailabilityEmailMessage45
       );
-      if (
-        vaccineAvailabilityEmailMessage45.length > 0 &&
-        telegramChat45 != "-1"
-      ) {
+      if (vaccineAvailabilityEmailMessage45.length > 0 && telegramChat45 != "-1") {
         axios
           .get(
             "https://api.telegram.org/bot" +
@@ -149,7 +146,7 @@ exports.main = function (event, context) {
           });
       }
 
-      if (vaccineAvailabilityEmailMessage.length > 0) {
+      if (vaccineAvailabilityEmailMessage.length > 0 && telegramChat != "-1") {
         axios
           .get(
             "https://api.telegram.org/bot" +
