@@ -1,5 +1,6 @@
 const axios = require("axios");
 var aws = require("aws-sdk");
+var crypto = require("crypto");
 
 let district = process.env.DISTRICT;
 let districtName = process.env.DISTRICT_NAME;
@@ -7,6 +8,10 @@ let token = process.env.TOKEN;
 let telegramToken = process.env.TELEGRAMTOKEN;
 let telegramChat = process.env.TELEGRAMCHAT;
 let telegramChat45 = process.env.TELEGRMCHAT45;
+let dynamodbTable = process.env.COOLOFFTABLE;
+let cooloffHrs = 24;
+
+var docClient = new aws.DynamoDB.DocumentClient();
 
 function sleep(milliseconds) {
   const date = Date.now();
@@ -15,6 +20,55 @@ function sleep(milliseconds) {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
 }
+function checksum(str, algorithm, encoding) {
+  return crypto
+    .createHash(algorithm || "md5")
+    .update(str, "utf8")
+    .digest(encoding || "hex");
+}
+
+function storeChecksumSendNotification(checksum, vaccineAvailabilityEmailMessage,ageGroup) {
+  var expiryTime = new Date();
+  expiryTime.setHours(new Date().getHours() + cooloffHrs);
+
+  var params = {
+    TableName: dynamodbTable,
+    Item: {
+      id: district + telegramToken + ageGroup,
+      checksum: checksum,
+      timetolive: expiryTime.getTime(),
+    },
+  };
+  docClient.put(params, function (err, insertdata) {
+    if (err) {
+      console.error(
+        "Unable to add item. Error JSON:",
+        JSON.stringify(err, null, 2)
+      );
+    } else {
+      console.log(
+        "Added item:",
+        JSON.stringify(insertdata, null, 2)
+      );
+      //sending notification
+      axios
+        .get(
+          "https://api.telegram.org/bot" +
+          telegramToken +
+          "/sendMessage?chat_id=" +
+          telegramChat +
+          "&text=Alert for " +
+          districtName +
+          " : Vaccine available for ("+ageGroup+") age group \n" +
+          vaccineAvailabilityEmailMessage
+        )
+        .then(function (response) {
+          console.log("Message Send to telegram");
+        });
+    }
+  });
+}
+
 
 exports.main = function (event, context) {
   //wait random amount of time from 1 ms to 10 sec
@@ -129,38 +183,87 @@ exports.main = function (event, context) {
         "Email Message will be send -> ",
         vaccineAvailabilityEmailMessage45
       );
-      if (vaccineAvailabilityEmailMessage45.length > 0 && telegramChat45 != "-1") {
-        axios
-          .get(
-            "https://api.telegram.org/bot" +
-              telegramToken +
-              "/sendMessage?chat_id=" +
-              telegramChat45 +
-              "&text=Alert for " +
-              districtName +
-              " : Vaccine available for (45 and Above) age group \n" +
-              vaccineAvailabilityEmailMessage45
-          )
-          .then(function (response) {
-            console.log("Message Send to telegram");
-          });
-      }
 
+
+      
+
+       //Calculate the checksum for the messages (45 and 18 both)
+      //compare it with dynamodb checksum (if exists)
+      //if same with dynamodb, ignore and do not send notification.
+      //Else, send message and store the new value in dynamdo
+  
+      //for 45 age group
+      if (
+        vaccineAvailabilityEmailMessage45.length > 0 &&
+        telegramChat45 != "-1"
+      ) {
+        var checksum45 = checksum(
+          JSON.stringify(vaccineAvailabilityEmailMessage45)
+        );
+        //check in dynamodb table
+        var ddbscanparam = {
+          TableName: dynamodbTable,
+          Key: {
+            id: district + telegramToken + "45",
+          },
+        };
+        docClient.get(ddbscanparam, function (err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data);
+            if (data.Item) {
+              //check the checksum value. If they are same do not send notification
+              //If value are different store the new value and send notification.
+              if(data.Item.checksum == checksum45){
+                //do nothing
+                console.log('Checksum is same. Will not send notification ->' , checksum45)
+              }
+              else{
+                console.log('Checksum is different, calculated ->' , checksum45 , ' From Dynamodb -> ',data.Item[0].checksum, ' Notification will be send')
+                storeChecksumSendNotification(checksum45, vaccineAvailabilityEmailMessage45,'45');
+              }
+            } else {
+              // store new checksum and send notification
+              console.log('No Checksum found in dynamodb table. Storing now')
+              storeChecksumSendNotification(checksum45, vaccineAvailabilityEmailMessage45,'45');
+            }
+          }
+        });
+      }
+      //for 18 agegroup
       if (vaccineAvailabilityEmailMessage.length > 0 && telegramChat != "-1") {
-        axios
-          .get(
-            "https://api.telegram.org/bot" +
-              telegramToken +
-              "/sendMessage?chat_id=" +
-              telegramChat +
-              "&text=Alert for " +
-              districtName +
-              " : Vaccine available for (18-44) age group \n" +
-              vaccineAvailabilityEmailMessage
-          )
-          .then(function (response) {
-            console.log("Message Send to telegram");
-          });
+        var checksum18 = checksum(
+          JSON.stringify(vaccineAvailabilityEmailMessage)
+        );
+        //check in dynamodb table
+        var ddbscanparam = {
+          TableName: dynamodbTable,
+          Key: {
+            id: district + telegramToken + "18",
+          },
+        };
+        docClient.get(ddbscanparam, function (err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Length-> ',data.Item);
+
+            if (data.Item) {
+              if(data.Item.checksum == checksum18){
+                //do nothing
+                console.log('Checksum is same. Will not send notification ->' , checksum18)
+              }
+              else{
+                console.log('Checksum is different, calculated ->' , checksum18, ' From Dynamodb -> ',data.Item[0].checksum)
+                storeChecksumSendNotification(checksum18, vaccineAvailabilityEmailMessage,'18');
+              }
+            } else {
+              console.log('No Checksum found in dynamodb table. Storing now')
+              storeChecksumSendNotification(checksum18, vaccineAvailabilityEmailMessage,'18');
+            }
+          }
+        });
       }
     })
     .catch(function (error) {

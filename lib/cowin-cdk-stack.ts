@@ -14,11 +14,18 @@ interface CowinCdkStackProps extends StackProps {
   telegramChat45: string;
   frequency: string;
 }
+//TODO : Add cool off period of n sec if the message is same. Use dynamodb.
+
 
 export class CowinCdkStack extends Stack {
   constructor(scope: Construct, id: string, props: CowinCdkStackProps) {
     super(scope, id, props);
     
+    const cooloff = new ddb.Table(this, 'CoolOff', {
+      partitionKey: { name: "id", type: ddb.AttributeType.STRING },
+      timeToLiveAttribute: 'timetolive'
+    });
+
 
     // The code that defines your stack goes here
     const lambdaFunction = new lambda.Function(this, "CoWinData", {
@@ -32,17 +39,18 @@ export class CowinCdkStack extends Stack {
         'TOKEN' : props.token,
         'TELEGRAMTOKEN' : props.telegramToken,
         'TELEGRAMCHAT' : props.telegramChat,
-        'TELEGRMCHAT45' : props.telegramChat45
+        'TELEGRMCHAT45' : props.telegramChat45,
+        'COOLOFFTABLE' : cooloff.tableName
       },
       retryAttempts: 2,
       tracing: Tracing.ACTIVE
     });
+    cooloff.grantReadWriteData(lambdaFunction);
 
     const rule = new Rule(this, 'Rule', {
       schedule: Schedule.expression('cron('+props.frequency+')')
     });
     rule.addTarget(new targets.LambdaFunction(lambdaFunction));
 
-    //Tags.of(lambdaFunction).add('auto-delete', 'never');
   }
 }
