@@ -27,7 +27,11 @@ function checksum(str, algorithm, encoding) {
     .digest(encoding || "hex");
 }
 
-function storeChecksumSendNotification(checksum, vaccineAvailabilityEmailMessage,ageGroup) {
+function storeChecksumSendNotification(
+  checksum,
+  vaccineAvailabilityEmailMessage,
+  ageGroup
+) {
   var expiryTime = new Date();
   expiryTime.setHours(new Date().getHours() + cooloffHrs);
 
@@ -46,35 +50,30 @@ function storeChecksumSendNotification(checksum, vaccineAvailabilityEmailMessage
         JSON.stringify(err, null, 2)
       );
     } else {
-      console.log(
-        "Added item:",
-        JSON.stringify(insertdata, null, 2)
-      );
+      console.log("Added item:", JSON.stringify(insertdata, null, 2));
       //sending notification
       axios
-        .get(
-          "https://api.telegram.org/bot" +
-          telegramToken +
-          "/sendMessage?chat_id=" +
-          telegramChat +
-          "&text=Alert for " +
-          districtName +
-          " : Vaccine available for ("+ageGroup+") age group \n" +
-          vaccineAvailabilityEmailMessage
-        )
+        .post("https://api.telegram.org/bot" + telegramToken + "/sendMessage", {
+          chat_id: telegramChat,
+          text:
+            "Alert for " +
+            districtName +
+            " : Vaccine available for (" +
+            ageGroup +
+            ") age group \n" +
+            vaccineAvailabilityEmailMessage,
+        })
         .then(function (response) {
-          console.log("Message Send to telegram");
+          console.log("Message Send to telegram->",response);
         });
     }
   });
 }
 
-
 exports.main = function (event, context) {
   //wait random amount of time from 1 ms to 10 sec
   //var sleeptime = Math.floor(Math.random() * 1000) + 1;
   //sleep(sleeptime)
-
 
   var noresponse = true;
   //while(noresponse){
@@ -99,7 +98,7 @@ exports.main = function (event, context) {
     referrer: "https://selfregistration.cowin.gov.in/",
     referrerPolicy: "strict-origin-when-cross-origin",
     method: "GET",
-    mode: "cors", 
+    mode: "cors",
     headers: {
       accept: "application/json, text/plain, */*",
       "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
@@ -110,8 +109,9 @@ exports.main = function (event, context) {
       "sec-fetch-dest": "empty",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "cross-site",
-      "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51"
-    }
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51",
+    },
   };
   axios
     .get(
@@ -131,21 +131,35 @@ exports.main = function (event, context) {
         var centerAddress = center.address;
         var pincode = center.pincode;
         var block = center.block_name;
-        var feeType = center.fee_type
+        var feeType = center.fee_type;
         center.sessions.forEach((session) => {
           var date = session.date;
           var minage = session.min_age_limit;
           var capacity = session.available_capacity;
-          var dose1 = session.available_capacity_dose1
-          var dose2 = session.available_capacity_dose2
+          var dose1 = session.available_capacity_dose1;
+          var dose2 = session.available_capacity_dose2;
           var vaccine = session.vaccine;
           if (capacity > 10 && minage < 44) {
             var emailmessage =
               "*** " +
-              capacity + " " +
-              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
+              capacity +
+              " " +
+              vaccine +
+              " (Dose 1 : " +
+              dose1 +
+              " , Dose 2 : " +
+              dose2 +
+              ") " +
               " vaccine(s) available in center :" +
-              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              centerName +
+              " \nAddress : " +
+              centerAddress +
+              " \nPincode : " +
+              pincode +
+              " \nBlock : " +
+              block +
+              " \nFee Type : " +
+              feeType +
               "  \nDate : " +
               date +
               " \n";
@@ -153,10 +167,24 @@ exports.main = function (event, context) {
           } else if (capacity > 10 && minage > 44) {
             var message =
               "*** " +
-              capacity +" " +
-              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
+              capacity +
+              " " +
+              vaccine +
+              " (Dose 1 : " +
+              dose1 +
+              " , Dose 2 : " +
+              dose2 +
+              ") " +
               " vaccine(s) available in center :" +
-              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              centerName +
+              " \nAddress : " +
+              centerAddress +
+              " \nPincode : " +
+              pincode +
+              " \nBlock : " +
+              block +
+              " \nFee Type : " +
+              feeType +
               "  \nDate : " +
               date +
               " \n";
@@ -164,10 +192,24 @@ exports.main = function (event, context) {
           } else {
             var message =
               "*** " +
-              capacity + " " +
-              vaccine + " (Dose 1 : "+dose1+" , Dose 2 : "+ dose2+") "+
+              capacity +
+              " " +
+              vaccine +
+              " (Dose 1 : " +
+              dose1 +
+              " , Dose 2 : " +
+              dose2 +
+              ") " +
               " vaccine(s) available in center :" +
-              centerName +" \nAddress : "+centerAddress+ " \nPincode : "+pincode+" \nBlock : "+block+" \nFee Type : "+feeType+
+              centerName +
+              " \nAddress : " +
+              centerAddress +
+              " \nPincode : " +
+              pincode +
+              " \nBlock : " +
+              block +
+              " \nFee Type : " +
+              feeType +
               " \nDate : " +
               date +
               " \n";
@@ -184,14 +226,11 @@ exports.main = function (event, context) {
         vaccineAvailabilityEmailMessage45
       );
 
-
-      
-
-       //Calculate the checksum for the messages (45 and 18 both)
+      //Calculate the checksum for the messages (45 and 18 both)
       //compare it with dynamodb checksum (if exists)
       //if same with dynamodb, ignore and do not send notification.
       //Else, send message and store the new value in dynamdo
-  
+
       //for 45 age group
       if (
         vaccineAvailabilityEmailMessage45.length > 0 &&
@@ -211,22 +250,38 @@ exports.main = function (event, context) {
           if (err) {
             console.log(err);
           } else {
-            console.log('Dynamodb Item is -> ',data.Item);
+            console.log("Dynamodb Item is -> ", data.Item);
             if (data.Item) {
               //check the checksum value. If they are same do not send notification
               //If value are different store the new value and send notification.
-              if(data.Item.checksum == checksum45){
+              if (data.Item.checksum == checksum45) {
                 //do nothing
-                console.log('Checksum is same. Will not send notification ->' , checksum45)
-              }
-              else{
-                console.log('Checksum is different, calculated ->' , checksum45 , ' From Dynamodb -> ',data.Item[0].checksum, ' Notification will be send')
-                storeChecksumSendNotification(checksum45, vaccineAvailabilityEmailMessage45,'45');
+                console.log(
+                  "Checksum is same. Will not send notification ->",
+                  checksum45
+                );
+              } else {
+                console.log(
+                  "Checksum is different, calculated ->",
+                  checksum45,
+                  " From Dynamodb -> ",
+                  data.Item.checksum,
+                  " Notification will be send"
+                );
+                storeChecksumSendNotification(
+                  checksum45,
+                  vaccineAvailabilityEmailMessage45,
+                  "45"
+                );
               }
             } else {
               // store new checksum and send notification
-              console.log('No Checksum found in dynamodb table. Storing now')
-              storeChecksumSendNotification(checksum45, vaccineAvailabilityEmailMessage45,'45');
+              console.log("No Checksum found in dynamodb table. Storing now");
+              storeChecksumSendNotification(
+                checksum45,
+                vaccineAvailabilityEmailMessage45,
+                "45"
+              );
             }
           }
         });
@@ -247,20 +302,35 @@ exports.main = function (event, context) {
           if (err) {
             console.log(err);
           } else {
-            console.log('Dynamodb Item is -> ',data.Item);
+            console.log("Dynamodb Item is -> ", data.Item);
 
             if (data.Item) {
-              if(data.Item.checksum == checksum18){
+              if (data.Item.checksum == checksum18) {
                 //do nothing
-                console.log('Checksum is same. Will not send notification ->' , checksum18)
-              }
-              else{
-                console.log('Checksum is different, calculated ->' , checksum18, ' From Dynamodb -> ',data.Item[0].checksum)
-                storeChecksumSendNotification(checksum18, vaccineAvailabilityEmailMessage,'18');
+                console.log(
+                  "Checksum is same. Will not send notification ->",
+                  checksum18
+                );
+              } else {
+                console.log(
+                  "Checksum is different, calculated ->",
+                  checksum18,
+                  " From Dynamodb -> ",
+                  data.Item.checksum
+                );
+                storeChecksumSendNotification(
+                  checksum18,
+                  vaccineAvailabilityEmailMessage,
+                  "18"
+                );
               }
             } else {
-              console.log('No Checksum found in dynamodb table. Storing now')
-              storeChecksumSendNotification(checksum18, vaccineAvailabilityEmailMessage,'18');
+              console.log("No Checksum found in dynamodb table. Storing now");
+              storeChecksumSendNotification(
+                checksum18,
+                vaccineAvailabilityEmailMessage,
+                "18"
+              );
             }
           }
         });
