@@ -211,7 +211,7 @@ exports.main = function (event, context) {
           if (err) {
             console.log(err);
           } else {
-            console.log(data);
+            console.log('Dynamodb Item is -> ',data.Item);
             if (data.Item) {
               //check the checksum value. If they are same do not send notification
               //If value are different store the new value and send notification.
@@ -247,7 +247,7 @@ exports.main = function (event, context) {
           if (err) {
             console.log(err);
           } else {
-            console.log('Length-> ',data.Item);
+            console.log('Dynamodb Item is -> ',data.Item);
 
             if (data.Item) {
               if(data.Item.checksum == checksum18){
