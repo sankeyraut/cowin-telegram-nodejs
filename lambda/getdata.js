@@ -30,7 +30,8 @@ function checksum(str, algorithm, encoding) {
 function storeChecksumSendNotification(
   checksum,
   vaccineAvailabilityEmailMessage,
-  ageGroup
+  ageGroup,
+  tcID
 ) {
   var expiryTime = new Date();
   expiryTime.setHours(new Date().getHours() + cooloffHrs);
@@ -50,18 +51,21 @@ function storeChecksumSendNotification(
         JSON.stringify(err, null, 2)
       );
     } else {
-      console.log("Added item:", JSON.stringify(insertdata, null, 2));
+      console.log("Added item:", JSON.stringify(insertdata));
       //sending notification
+      var telegrammessage = "Alert for " +
+      districtName +
+      " : Vaccine available for (" +
+      ageGroup +
+      ") age group \n" +
+      vaccineAvailabilityEmailMessage;
+
+      console.log('Sending Telegram message -> ',telegrammessage)
+
       axios
         .post("https://api.telegram.org/bot" + telegramToken + "/sendMessage", {
-          chat_id: telegramChat,
-          text:
-            "Alert for " +
-            districtName +
-            " : Vaccine available for (" +
-            ageGroup +
-            ") age group \n" +
-            vaccineAvailabilityEmailMessage,
+          chat_id: tcID,
+          text: telegrammessage
         })
         .then(function (response) {
           console.log("Message Send to telegram->",response);
@@ -83,6 +87,7 @@ exports.main = function (event, context) {
   let data;
   var vaccineAvailabilityEmailMessage = [];
   var vaccineAvailabilityEmailMessage45 = [];
+  var vaccineNonAvailability = [];
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
   if (dd < 10) {
@@ -213,19 +218,14 @@ exports.main = function (event, context) {
               " \nDate : " +
               date +
               " \n";
-            console.log(message);
+            //console.log(message);
+            vaccineNonAvailability.push(message)
           }
         });
       });
-      console.log(
-        "Email Message will be send -> ",
-        vaccineAvailabilityEmailMessage
-      );
-      console.log(
-        "Email Message will be send -> ",
-        vaccineAvailabilityEmailMessage45
-      );
-
+      console.log('Non Available vaccine -> ',vaccineNonAvailability)
+      console.log('18+ vaccine -> ',vaccineAvailabilityEmailMessage)
+      console.log('45+ vaccine -> ',vaccineAvailabilityEmailMessage45)
       //Calculate the checksum for the messages (45 and 18 both)
       //compare it with dynamodb checksum (if exists)
       //if same with dynamodb, ignore and do not send notification.
@@ -236,9 +236,13 @@ exports.main = function (event, context) {
         vaccineAvailabilityEmailMessage45.length > 0 &&
         telegramChat45 != "-1"
       ) {
+
+        
         var checksum45 = checksum(
           JSON.stringify(vaccineAvailabilityEmailMessage45)
         );
+        console.log("For 45 Age Group. Check sum is -> ",checksum45)
+
         //check in dynamodb table
         var ddbscanparam = {
           TableName: dynamodbTable,
@@ -271,7 +275,7 @@ exports.main = function (event, context) {
                 storeChecksumSendNotification(
                   checksum45,
                   vaccineAvailabilityEmailMessage45,
-                  "45"
+                  "45",telegramChat45
                 );
               }
             } else {
@@ -280,7 +284,7 @@ exports.main = function (event, context) {
               storeChecksumSendNotification(
                 checksum45,
                 vaccineAvailabilityEmailMessage45,
-                "45"
+                "45",telegramChat45
               );
             }
           }
@@ -291,6 +295,7 @@ exports.main = function (event, context) {
         var checksum18 = checksum(
           JSON.stringify(vaccineAvailabilityEmailMessage)
         );
+        console.log("For 18 Age Group. Check sum is -> ",checksum18)
         //check in dynamodb table
         var ddbscanparam = {
           TableName: dynamodbTable,
@@ -321,7 +326,7 @@ exports.main = function (event, context) {
                 storeChecksumSendNotification(
                   checksum18,
                   vaccineAvailabilityEmailMessage,
-                  "18"
+                  "18",telegramChat
                 );
               }
             } else {
@@ -329,7 +334,7 @@ exports.main = function (event, context) {
               storeChecksumSendNotification(
                 checksum18,
                 vaccineAvailabilityEmailMessage,
-                "18"
+                "18",telegramChat
               );
             }
           }
