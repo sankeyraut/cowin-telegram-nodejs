@@ -137,6 +137,12 @@ exports.main = function (event, context) {
         var pincode = center.pincode;
         var block = center.block_name;
         var feeType = center.fee_type;
+        var vaccine_fees = center.vaccine_fees;
+        var fee = '0'
+        if(vaccine_fees){
+          fee = vaccine_fees[0].fee
+        }
+        
         center.sessions.forEach((session) => {
           var date = session.date;
           var minage = session.min_age_limit;
@@ -144,6 +150,8 @@ exports.main = function (event, context) {
           var dose1 = session.available_capacity_dose1;
           var dose2 = session.available_capacity_dose2;
           var vaccine = session.vaccine;
+          
+
           if (capacity > 10 && minage < 44) {
             var emailmessage =
               "*** " +
@@ -164,7 +172,7 @@ exports.main = function (event, context) {
               " \nBlock : " +
               block +
               " \nFee Type : " +
-              feeType +
+              feeType + "(Rs."+fee+")"+
               "  \nDate : " +
               date +
               " \n";
@@ -189,7 +197,7 @@ exports.main = function (event, context) {
               " \nBlock : " +
               block +
               " \nFee Type : " +
-              feeType +
+              feeType + "(Rs."+fee+")"+
               "  \nDate : " +
               date +
               " \n";
@@ -214,7 +222,7 @@ exports.main = function (event, context) {
               " \nBlock : " +
               block +
               " \nFee Type : " +
-              feeType +
+              feeType + "(Rs."+fee+")"+
               " \nDate : " +
               date +
               " \n";
