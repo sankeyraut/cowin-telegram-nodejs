@@ -1,6 +1,6 @@
-# Welcome to your CDK TypeScript project!
+# Welcome to COWIN API Notification tool !
 
-This is a blank project for TypeScript development with CDK.
+This is a  project for getting real time alerts about India vaccine availability on telegram group.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
