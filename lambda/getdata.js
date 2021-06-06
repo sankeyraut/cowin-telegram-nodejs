@@ -4,7 +4,6 @@ var crypto = require("crypto");
 
 let district = process.env.DISTRICT;
 let districtName = process.env.DISTRICT_NAME;
-let token = process.env.TOKEN;
 let telegramToken = process.env.TELEGRAMTOKEN;
 let telegramChat = process.env.TELEGRAMCHAT;
 let telegramChat45 = process.env.TELEGRMCHAT45;
@@ -13,13 +12,6 @@ let cooloffHrs = 24;
 
 var docClient = new aws.DynamoDB.DocumentClient();
 
-function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
-}
 function checksum(str, algorithm, encoding) {
   return crypto
     .createHash(algorithm || "md5")
@@ -100,16 +92,15 @@ exports.main = function (event, context) {
   today = dd + "-" + mm + "-" + yyyy;
   console.log("Date to be used in request - > ", today);
   const options = {
-    referrer: "https://selfregistration.cowin.gov.in/",
+    referrer: "https://www.cowin.gov.in/",
     referrerPolicy: "strict-origin-when-cross-origin",
+    body: null,
     method: "GET",
     mode: "cors",
     headers: {
-      accept: "application/json, text/plain, */*",
+      "accept": "application/json, text/plain, */*",
       "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
-      authorization: "Bearer " + token,
-      "sec-ch-ua":
-        '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+      "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
       "sec-ch-ua-mobile": "?0",
       "sec-fetch-dest": "empty",
       "sec-fetch-mode": "cors",
@@ -120,7 +111,7 @@ exports.main = function (event, context) {
   };
   axios
     .get(
-      "https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id=" +
+      "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=" +
         district +
         "&date=" +
         today,

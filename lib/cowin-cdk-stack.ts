@@ -8,7 +8,6 @@ import { Tracing } from '@aws-cdk/aws-lambda';
 interface CowinCdkStackProps extends StackProps {
   district: string;
   districtName : string;
-  token: string;
   telegramToken: string;
   telegramChat: string;
   telegramChat45: string;
@@ -36,7 +35,6 @@ export class CowinCdkStack extends Stack {
       environment: {
         'DISTRICT': props.district,
         'DISTRICT_NAME' : props.districtName,
-        'TOKEN' : props.token,
         'TELEGRAMTOKEN' : props.telegramToken,
         'TELEGRAMCHAT' : props.telegramChat,
         'TELEGRMCHAT45' : props.telegramChat45,

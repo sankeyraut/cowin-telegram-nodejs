@@ -3,46 +3,44 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { CowinCdkStack } from '../lib/cowin-cdk-stack';
 import { Tags } from '@aws-cdk/core';
-const envBOM = { account: '3185922xxxxx', region: 'ap-south-1' };
+const envBOM = { account: '3185xxxxxx', region: 'ap-south-1' };
 const app = new cdk.App();
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxxxxxxxxzYmUxYy0xZjM3LTQ3NDEtOTI4ZC1lY2MyZjNhOGY2N2UiLCJ1c2VyX2lkIjoiMTZmM2JlMWMtMWYzNy00NzQxLTkyOGQtZWNjMmYzYThmNjdlIiwidXNlcl90eXBlIjoiQkVORUZJQ0lBUlkiLCJtb2JpbGVfbnVtYmVyIjo5NTk0MDgwMDk4LCJiZW5lZmljaWFyeV9yZWZlcmVuY2VfaWQiOjYwMzQ2ODExNTA4NDAwLCJ1YSI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MC4wLjQ0MzAuOTMgU2FmYXJpLzUzNy4zNiIsImRhdGVfbW9kaWZpZWQiOiIyMDIxLTA1LTA2VDAyOjI3OjQxLjIxMVoiLCJpYXQiOjE2MjAyNjgwNjEsImV4cCI6MTYyMDI2ODk2MX0.sJIMOgxK08JuSyobfj4xMyblDvGAkU24pxVfcTvTB7E";
-const telegramtokenStr = 'xxxxx:xxxxxxxxx_MvVwKMLnl_XP2tYWJY_UY'
-const frequency = '*/1 * * * ? *'; //every minute
+const telegramtokenStr = '17192xxxxx:AAHcIHokaNM0r_xxxxxxxx_XP2tYWJY_UY'
+const frequency = '*/1 * * * ? *'; //every one minute
 Tags.of(app).add("auto-delete", "no");
 //for mumbai , thane and palghar
-const telegramchatStr = '-10011891xxxxx'
-new CowinCdkStack(app, 'CowinCdkStackPalghar',{env: envBOM,district:'394',frequency:frequency,districtName: 'Palghar',token: token,telegramToken:telegramtokenStr,telegramChat:telegramchatStr,email: 'false',telegramChat45:telegramchatStr});
-new CowinCdkStack(app, 'CowinCdkStackMumbai',{env: envBOM,district:'395',frequency:frequency,districtName: 'Mumbai',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStr,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackThane',{env: envBOM,district:'392',frequency:frequency,districtName: 'Thane',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStr,email: 'false',telegramChat45:telegramchatStr});
+const telegramchatStr = '-10011xxxxxxx'
+//const frequencyMumbai = '*/1 * * * ? *'; //every minute
+new CowinCdkStack(app, 'CowinCdkStackPalghar',{env: envBOM,district:'394',frequency:frequency,districtName: 'Palghar',telegramToken:telegramtokenStr,telegramChat:telegramchatStr,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackMumbai',{env: envBOM,district:'395',frequency:frequency,districtName: 'Mumbai',telegramToken:telegramtokenStr,telegramChat:telegramchatStr,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackThane',{env: envBOM,district:'392',frequency:frequency,districtName: 'Thane',telegramToken:telegramtokenStr,telegramChat:telegramchatStr,telegramChat45:'-1'});
 
 //for delhi folks
-const telegramchatStrDelhi = '-10013732xxxxx'
-new CowinCdkStack(app, 'CowinCdkStackCDelhi',{env: envBOM,district:'141',frequency:frequency,districtName: 'Central Delhi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackSEDelhi',{env: envBOM,district:'144',frequency:frequency,districtName: 'South East Delhi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackSWDelhi',{env: envBOM,district:'150',frequency:frequency,districtName: 'South West Delhi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackSDelhi',{env: envBOM,district:'149',frequency:frequency,districtName: 'South Delhi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,email: 'false',telegramChat45:'-1'});
+const telegramchatStrDelhi = '-10013xxxxxxx'
+//const delhiFrequency = '*/1 * * * ? *'
+new CowinCdkStack(app, 'CowinCdkStackCDelhi',{env: envBOM,district:'141',frequency:frequency,districtName: 'Central Delhi',telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackSEDelhi',{env: envBOM,district:'144',frequency:frequency,districtName: 'South East Delhi',telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackSWDelhi',{env: envBOM,district:'150',frequency:frequency,districtName: 'South West Delhi',telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackSDelhi',{env: envBOM,district:'149',frequency:frequency,districtName: 'South Delhi',telegramToken:telegramtokenStr,telegramChat:telegramchatStrDelhi,telegramChat45:'-1'});
 
 //others
-const telegramchatStrOthers = '-10013085xxxxx'
-new CowinCdkStack(app, 'CowinCdkStackMeerut',{env: envBOM,district:'676',frequency:frequency,districtName: 'Meerut',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackPune',{env: envBOM,district:'363',frequency:frequency,districtName: 'Pune',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackNGoa',{env: envBOM,district:'151',frequency:frequency,districtName: 'N. Goa',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackBhopal',{env: envBOM,district:'312',frequency:frequency,districtName: 'Bhopal',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackMedchal',{env: envBOM,district:'596',frequency:frequency,districtName: 'Medchal',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackUdupi',{env: envBOM,district:'286',frequency:frequency,districtName: 'Udupi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackDKannada',{env: envBOM,district:'269',frequency:frequency,districtName: 'D. Kannada',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackGurugram',{env: envBOM,district:'188',frequency:frequency,districtName: 'Gurugram',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,email: 'false',telegramChat45:'-1'});
+const telegramchatStrOthers = '-1001xxxxxxx'
+new CowinCdkStack(app, 'CowinCdkStackPune',{env: envBOM,district:'363',frequency:frequency,districtName: 'Pune',telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackGurugram',{env: envBOM,district:'188',frequency:frequency,districtName: 'Gurugram',telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackChennai',{env: envBOM,district:'571',frequency:frequency,districtName: 'Chennai',telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackMeerut',{env: envBOM,district:'676',frequency:frequency,districtName: 'Meerut',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackBhopal',{env: envBOM,district:'312',frequency:frequency,districtName: 'Bhopal',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackMedchal',{env: envBOM,district:'596',frequency:frequency,districtName: 'Medchal',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackUdupi',{env: envBOM,district:'286',frequency:frequency,districtName: 'Udupi',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackDKannada',{env: envBOM,district:'269',frequency:frequency,districtName: 'D. Kannada',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackNashik',{env: envBOM,district:'389',frequency:frequency,districtName: 'Nashik',token:token,telegramToken:telegramtokenStr,telegramChat:'-1',telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackGhaziabad',{env: envBOM,district:'651',frequency:frequency,districtName: 'Ghaziabad',token:token,telegramToken:telegramtokenStr,telegramChat:'-1',telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackGBNagar',{env: envBOM,district:'650',frequency:frequency,districtName: 'Gautam Buddha Nagar',token:token,telegramToken:telegramtokenStr,telegramChat:'-1',telegramChat45:'-1'});
+//new CowinCdkStack(app, 'CowinCdkStackNGoa',{env: envBOM,district:'151',frequency:frequency,districtName: 'N. Goa',telegramToken:telegramtokenStr,telegramChat:telegramchatStrOthers,telegramChat45:'-1'});
 
 
 //for bangalore folks
-const telegramchatStrbangalore = '-10011678xxxxx'
-new CowinCdkStack(app, 'CowinCdkStackbangaloreUrban',{env: envBOM,district:'265',frequency:frequency,districtName: 'BangaloreUrban',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrbangalore,email: 'false',telegramChat45:'-1'});
-new CowinCdkStack(app, 'CowinCdkStackbangaloreRural',{env: envBOM,district:'276',frequency:frequency,districtName: 'BangaloreRural',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStrbangalore,email: 'false',telegramChat45:'-1'});
-
-
-
-//new CowinCdkStack(app, 'CowinCdkStackAgatti',{env: envBOM,district:'796',districtName: 'Agatti',token:token,telegramToken:telegramtokenStr,telegramChat:telegramchatStr});
-
-//TODO : Add dynamodb table for storing email id
-//TODO : Store district wise user user
-//TODO : Fetch emails from respective user list of that district
+const telegramchatStrbangalore = '-1001xxxxxxx'
+new CowinCdkStack(app, 'CowinCdkStackbangaloreUrban',{env: envBOM,district:'265',frequency:frequency,districtName: 'BangaloreUrban',telegramToken:telegramtokenStr,telegramChat:telegramchatStrbangalore,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackbangaloreRural',{env: envBOM,district:'276',frequency:frequency,districtName: 'BangaloreRural',telegramToken:telegramtokenStr,telegramChat:telegramchatStrbangalore,telegramChat45:'-1'});
+new CowinCdkStack(app, 'CowinCdkStackBBMP',{env: envBOM,district:'294',frequency:frequency,districtName: 'BBMP',telegramToken:telegramtokenStr,telegramChat:telegramchatStrbangalore,telegramChat45:'-1'});
